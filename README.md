@@ -1,2 +1,0 @@
-# mathinvaders
-Created with CodeSandbox
