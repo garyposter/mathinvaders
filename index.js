@@ -300,12 +300,13 @@ class Invaders extends Phaser.Scene {
       mounting: 0
     };
     this.physics.add.collider(this.ship.sprite, this.enemyGroup, () =>
-      this.ship.sprite.setVisible(false)
-    ); // XXX add better handler
+      this.endGame()
+    );
     this.input.keyboard.on("keydown", e => this.onKeyDown(e));
     // Level message
     this.levelText = {
       timer: null,
+      x: this.width / 2,
       field: this.add
         .text(this.width / 2, this.height / 5, "", {
           align: "center",
@@ -329,6 +330,7 @@ class Invaders extends Phaser.Scene {
     // Help message
     this.helpText = {
       timer: null,
+      x: this.width / 2,
       field: this.add
         .text(this.width / 2, (2 * this.height) / 5, "", {
           align: "center",
@@ -370,17 +372,35 @@ class Invaders extends Phaser.Scene {
         this.powerBar.width + 14,
         this.powerBar.height + 14
       );
+    // Bonus message
+    this.bonusText = {
+      timer: null,
+      x: this.powerBar.x + this.powerBar.width / 2,
+      field: this.add
+        .text(this.powerBar.x, this.powerBar.y - 45, "", {
+          align: "center",
+          fontFamily: "Courier",
+          fontSize: "24px",
+          fontStyle: "bold",
+          color: "#f00"
+        })
+        .setDepth(1000)
+    };
     // Laser beam
     this.laser = { timer: null, graphics: this.add.graphics() };
     // Different levels have different levels of enemies/problems
     this.createLevel(this.levels.next().value);
   }
 
+  endGame() {
+    this.mountings.forEach(m => m.disable());
+    this.ship.sprite.setVisible(false);
+    this.setText(this.levelText, "Game Over\n\nTry again next time");
+  }
+
   onWorldBounds(body) {
     if (body.blocked.down) {
-      this.mountings.forEach(m => m.disable());
-      this.ship.sprite.setVisible(false);
-      this.setText(this.levelText, "Game Over\n\nTry again next time");
+      this.endGame();
     }
     this.yGoal = this.markerEnemy.y + this.rowHeight * this.scale;
     if (this.powerBar.level > 0) {
@@ -451,7 +471,7 @@ class Invaders extends Phaser.Scene {
         })
       );
     }
-    textObj.field.x = (this.width - textObj.field.width) / 2;
+    textObj.field.x = textObj.x - textObj.field.width / 2;
   }
 
   onKeyDown(event) {
@@ -520,9 +540,13 @@ class Invaders extends Phaser.Scene {
         const groups = this.enemies.groups.filter(g => g.active);
         if (groups.length === 0) {
           const powerBonus = Math.pow(this.powerBar.level, 2);
-          this.addToScore(powerBonus);
+          if (powerBonus) {
+            this.setText(this.bonusText, "+" + powerBonus, 500);
+            this.addToScore(powerBonus);
+          }
           let nextLevel = this.levels.next();
           if (nextLevel.done) {
+            mounting.disable();
             this.setText(this.levelText, "Congratulations!\n\nGAME OVER");
           } else {
             this.createLevel(nextLevel.value);

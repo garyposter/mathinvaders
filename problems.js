@@ -18,9 +18,9 @@ export const generate = function*() {
 export const analyze = factors => {
   const [factor1, factor2] = factors;
   const FIVE_HELP =
-    "To multiply by 5 (like 5 * 8), first multiply by 10 (add a 0, like 80) and then divide that in half (like half of 80 is 40). That's the answer.";
+    "5 * ? (like 5 * 8): multiply by 10 (add a 0, like 80) and then divide that in half (like half of 80 is 40).";
   const TEN_HELP =
-    "To multiply by 10, add a zero at the end of the other number: 4 * 10 = 40 and 12 * 10 is 120";
+    "10 * ? (like 4 * 10): add a zero at the end of the other number (like 40)";
   const result = {
     factors: factors,
     product: factor1 * factor2,
@@ -43,7 +43,7 @@ export const analyze = factors => {
       return result;
     case 2:
       result.help =
-        "For multiplying by two, add the doubled number to itself: 2 x 5 = two fives, or 5 + 5";
+        "2 * ? (like 2 * 5): add the doubled number to itself (like 5 + 5 = 10)";
       result.level = 1;
       return result;
     default:
@@ -66,13 +66,13 @@ export const analyze = factors => {
         case 11:
           if (factor1 < 10) {
             result.help =
-              "For 11, if the other number is a single digit, repeat it: 6 * 11 = 66";
+              "11 * single digit (like 6 * 11): repeat the digit (like 66)";
             result.level = 1;
           }
           return result;
         case 9:
           result.help =
-            "For multiplying 9 by another single digit greater than 1, like 6, subtract one from the other digit (6 - 1 = 5). That's your 10s digit for the answer (so the answer in this case is in the 50s). Then subtract that digit from 9 (9 - 5 = 4). That's your ones digit. Putting them together, the answer of 6 * 9 = 54";
+            '9 * single digit (like 6 * 9): subtract one from the other digit from the other digit (6 - 1 = 5). Then subtract that result from 9 (9 - 5 = 4). Write down those two digits in order ("5" and "4" = 54)';
           result.level = 2;
           return result;
         default:
